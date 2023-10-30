@@ -25,7 +25,7 @@ client.on('messageCreate', async (message) => {
 
   message.channel.sendTyping()
 
-  let prevMessages = await message.channel.messages.fetch({ limit: 15 })
+  let prevMessages = await message.channel.messages.fetch({ limit: 3 })
   prevMessages.reverse()
 
   prevMessages.forEach((msg) => {
