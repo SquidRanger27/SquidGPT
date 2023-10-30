@@ -1,17 +1,63 @@
-// Require the necessary discord.js classes
-const { Client, Events, GatewayIntentBits } = require('discord.js')
-import dotenv from 'dotenv'
-// console.log(token)
-// Create a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds] })
+require('dotenv/config')
+const { Client, IntentsBitField } = require('discord.js')
+const axios = require('axios')
 
-// When the client is ready, run this code (only once)
-// We use 'c' for the event parameter to keep it separate from the already defined 'client'
-client.once(Events.ClientReady, (c) => {
-  console.log(`Ready! Logged in as ${c.user.tag}`)
+const client = new Client({
+  intents: [
+    IntentsBitField.Flags.Guilds,
+    IntentsBitField.Flags.GuildMessages,
+    IntentsBitField.Flags.MessageContent,
+  ],
 })
 
-// Log in to Discord with your client's token
-client.login(token)
+client.on('ready', () => {
+  console.log('The bot is online!')
+})
 
-hiii: 3
+client.on('messageCreate', async (message) => {
+  if (message.author.bot) return
+  if (message.channel.id !== process.env.CHANNEL_ID) return
+  if (message.content.startsWith('!')) return
+
+  let conversationLog = [
+    { role: 'system', content: 'you are a passive chatbot.' },
+  ]
+
+  message.channel.sendTyping()
+
+  let prevMessages = await message.channel.messages.fetch({ limit: 15 })
+  prevMessages.reverse()
+
+  prevMessages.forEach((msg) => {
+    if (message.content.startsWith('!')) return
+    if (msg.author.id !== client.user.id && message.author.bot) return
+    if (msg.author.id !== message.author.id) return
+
+    conversationLog.push({
+      role: 'user',
+      content: msg.content,
+    })
+  })
+
+  try {
+    const result = await axios.post(
+      'https://api.openai.com/v1/chat/completions',
+      {
+        model: 'gpt-3.5-turbo',
+        messages: conversationLog,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+
+    message.reply(result.data.choices[0].message)
+  } catch (error) {
+    console.error('OpenAI API error:', error.response.data)
+  }
+})
+
+client.login(process.env.TOKEN)
