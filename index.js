@@ -2,6 +2,15 @@ require('dotenv/config')
 const { Client, IntentsBitField } = require('discord.js')
 const axios = require('axios')
 
+const express = require('express')
+const app = express()
+
+app.use(express.static('public'))
+app.get('/wakeup', function (request, response) {
+  response.send('Wakeup successful.')
+  console.log(`Pinged at ${new Date()}`)
+})
+
 const client = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
