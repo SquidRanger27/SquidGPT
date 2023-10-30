@@ -1,7 +1,13 @@
 // -- imports, requirements, etc:
-require('dotenv/config')
+require('dotenv').config()
 const { Client, IntentsBitField } = require('discord.js')
 const axios = require('axios')
+
+// -- Go the fuck to sleep
+
+if (process.env.VERSION !== 'b53bfcb390eee632cbd375ccd825694e') {
+  process.exit(0)
+}
 
 // -- Wakeup ping (Thanks Tristan):
 const express = require('express')
@@ -17,7 +23,7 @@ const listener = app.listen(process.env.PORT, function () {
   console.log('Your app is listening on port ' + listener.address().port)
 })
 
-//-- Discord bot requirements, etc:
+// -- Discord bot requirements, etc:
 
 const client = new Client({
   intents: [
@@ -36,7 +42,7 @@ client.on('ready', () => {
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return
   if (message.channel.id !== process.env.CHANNEL_ID) return
-  if (message.content.startsWith('!')) return
+  if (message.content.startsWith('i!')) return
 
   let conversationLog = [
     { role: 'system', content: 'you are a informational chatbot.' },
@@ -49,7 +55,7 @@ client.on('messageCreate', async (message) => {
   prevMessages.reverse()
 
   prevMessages.forEach((msg) => {
-    if (message.content.startsWith('!')) return
+    if (msg.content.startsWith('i!')) return
     if (msg.author.id !== client.user.id && message.author.bot) return
     if (msg.author.id !== message.author.id) return
 
