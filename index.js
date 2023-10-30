@@ -1,7 +1,9 @@
+// -- imports, requirements, etc:
 require('dotenv/config')
 const { Client, IntentsBitField } = require('discord.js')
 const axios = require('axios')
 
+// -- Wakeup ping (Thanks Tristan):
 const express = require('express')
 const app = express()
 
@@ -15,6 +17,8 @@ const listener = app.listen(process.env.PORT, function () {
   console.log('Your app is listening on port ' + listener.address().port)
 })
 
+//-- Discord bot requirements, etc:
+
 const client = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
@@ -27,6 +31,8 @@ client.on('ready', () => {
   console.log('The bot is online!')
 })
 
+//-- message create:
+
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return
   if (message.channel.id !== process.env.CHANNEL_ID) return
@@ -36,8 +42,9 @@ client.on('messageCreate', async (message) => {
     { role: 'system', content: 'you are a informational chatbot.' },
   ]
 
-  message.channel.sendTyping()
+  await message.channel.sendTyping()
 
+  //-- read message history:   *FIX ME*
   let prevMessages = await message.channel.messages.fetch({ limit: 3 })
   prevMessages.reverse()
 
@@ -54,7 +61,7 @@ client.on('messageCreate', async (message) => {
 
   try {
     const result = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
+      'https://api.openai.com/v1/chat/completions', // investigate axios
       {
         model: 'gpt-3.5-turbo',
         messages: conversationLog,
