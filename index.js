@@ -11,6 +11,10 @@ app.get('/wakeup', function (request, response) {
   console.log(`Pinged at ${new Date()}`)
 })
 
+const listener = app.listen(process.env.PORT, function () {
+  console.log('Your app is listening on port ' + listener.address().port)
+})
+
 const client = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
