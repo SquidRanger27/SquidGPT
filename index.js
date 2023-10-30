@@ -20,7 +20,7 @@ client.on('messageCreate', async (message) => {
   if (message.content.startsWith('!')) return
 
   let conversationLog = [
-    { role: 'system', content: 'you are a passive chatbot.' },
+    { role: 'system', content: 'you are a informational chatbot.' },
   ]
 
   message.channel.sendTyping()
