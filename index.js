@@ -5,9 +5,9 @@ const axios = require('axios')
 
 // -- Go the fuck to sleep
 
-console.log(process.env)
+// console.log(process.env)
 
-if (process.env.VERSION !== 'f96e930bfc3d11e8628284dc82003a7c') {
+if (process.env.VERSION !== 'c854212e2d484aef5f47b5ffe9b105dd') {
   process.exit(0)
 }
 
