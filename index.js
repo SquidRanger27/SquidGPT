@@ -7,7 +7,7 @@ const axios = require('axios')
 
 // console.log(process.env)
 
-if (process.env.VERSION !== 'c854212e2d484aef5f47b5ffe9b105dd') {
+if (process.env.VERSION !== '4b4285f827c1feeeee7629feda7d7659') {
   process.exit(0)
 }
 
