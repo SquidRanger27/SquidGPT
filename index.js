@@ -7,7 +7,7 @@ const axios = require('axios')
 
 // console.log(process.env)
 
-if (process.env.VERSION !== '4b4285f827c1feeeee7629feda7d7659') {
+if (process.env.VERSION !== '123') {
   process.exit(0)
 }
 
@@ -42,24 +42,37 @@ client.on('ready', () => {
 //-- message create:
 
 client.on('messageCreate', async (message) => {
-  if (message.author.bot) return
-  if (message.channel.id !== process.env.CHANNEL_ID) return
-  if (message.content.startsWith('i!')) return
-
+  const settings = {
+    headerPrompt:
+      'You are a header generator chatbot. You summerise text sent by the user into a concise, simple, and neutral half sentence to be used as a topic header for the message. The header is always less than 35 characters. The header is general, not specific. The header should not be wrapped in any quotations. The header does not try to answer the question or text.',
+    assistantPrompt:
+      'You are an assistant discord chatbot. You provide clear and concise responses, to the users questions and queries.',
+    modelChoicePrompt:
+      'You are gpt-4. A highly advanced and intelligent AI GPT. You task is to evaluate how important and specific a question from the user is, and output a single number value between 0 and 1, where 0 is simple and 1 is complex. You should not answer the user.\nFactors that you should take in to account:\n- If the topic is specific, the value to should be closer to 1\n- If the topic is general knowlege related, the answer should be closer to 0\n- If the topic has little information about it on the internet, the value should be closer to 1\n- If the topic is a well known idea, it should be closer to 0\n- If the user explicity asks for gpt4 the value should be 1. \n- If the user explicity asks for gpt3 the value should be 0.',
+  }
+  if (
+    message.content.startsWith('i!') ||
+    message.author.bot ||
+    message.channel.id !== process.env.CHANNEL_ID
+  ) {
+    return
+  }
   let conversationLog = [
     { role: 'system', content: 'you are a informational chatbot.' },
   ]
-
   await message.channel.sendTyping()
 
   //-- read message history:   *FIX ME*
-  let prevMessages = await message.channel.messages.fetch({ limit: 3 })
+  let prevMessages = await message.channel.messages.fetch({ limit: 4 })
   prevMessages.reverse()
 
   prevMessages.forEach((msg) => {
-    if (msg.content.startsWith('i!')) return
-    if (msg.author.id !== client.user.id && message.author.bot) return
-    if (msg.author.id !== message.author.id) return
+    if (
+      msg.content.startsWith('i!') ||
+      (msg.author.id !== client.user.id && message.author.bot) ||
+      msg.author.id !== message.author.id
+    )
+      return
 
     conversationLog.push({
       role: 'user',
@@ -71,7 +84,7 @@ client.on('messageCreate', async (message) => {
     const result = await axios.post(
       'https://api.openai.com/v1/chat/completions', // investigate axios
       {
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4-1106-preview',
         messages: conversationLog,
       },
       {
